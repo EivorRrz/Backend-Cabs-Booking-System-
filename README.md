@@ -31,11 +31,11 @@ A complete backend system for a **Cabs Booking System** built with  **NodeJs** ,
 - **Environment Management**: dotenv
 
 
-## ⚙️ Setup Instructions
+## ⚙️ Instructions
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/EivorRrz/Backend-Cabs-Booking-System-.git
    cd backend
 
 2. Create a .env file in the root directory with the following variables:
