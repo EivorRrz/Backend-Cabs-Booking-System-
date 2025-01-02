@@ -10,16 +10,16 @@ A complete backend system for a **Cabs Booking System** built with  **NodeJs** ,
 - **Profile**: Fetch the authenticated user's profile details.
 - **Logout**: Logs users out by invalidating their JWT token.
 
-### Driver Authentication
-- **Register Driver**: Drivers can register by providing their email, name, vehicle details, and password.
-- **Login Driver**: Authenticated drivers receive a JWT token for further requests.
-- **Profile**: Fetch the authenticated driver's profile details.
-- **Logout**: Logs drivers out by invalidating their JWT token.
+### Captain Authentication
+- **Register Captain**: Captain can register by providing their email, name, vehicle details, and password.
+- **Login Captain**: Authenticated Captain receive a JWT token for further requests.
+- **Profile**: Fetch the authenticated Captain's  profile details.
+- **Logout**: Logs Captain out by invalidating their JWT token.
 
 ### Ride Management
 - **Book Ride**: Users can book a ride by providing pick-up and drop-off locations.
-- **Ride Status**: Drivers can update the status of the ride (e.g., accepted, completed).
-- **Ride History**: Users and drivers can view their past rides.
+- **Ride Status**: Captain can update the status of the ride (e.g., accepted, completed).
+- **Ride History**: Users and Captain can view their past rides.
 
 ## Tech Stack
 
