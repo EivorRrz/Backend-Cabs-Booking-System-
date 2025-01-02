@@ -54,13 +54,14 @@ A complete backend system for a **Cabs Booking System** built with  **NodeJs** ,
     POST /api/users/register: Register a new user with email, name, and password.
     POST /api/users/login: Login an existing user and receive a JWT token.
     GET /api/users/profile: Fetch the authenticated user's profile details.
-   POST /api/users/logout: Log the user out by invalidating their JWT token
+    POST /api/users/logout: Log the user out by invalidating their JWT token
    
 5.  captain Routes
    ```bash
-   POST /api/captain/register: Register a new driver with email, name, vehicle details, and 
-   password.
-   POST /api/captain/login: Login an existing driver and receive a JWT token.
-   GET /api/captain/profile: Fetch the authenticated driver's profile details.
-   POST /api/captain/logout: Log the driver out by invalidating their JWT token.
+    POST /api/captain/register: Register a new driver with email, name, vehicle details, and 
+    password.
+    POST /api/captain/login: Login an existing driver and receive a JWT token.
+    GET /api/captain/profile: Fetch the authenticated driver's profile details.
+    POST /api/captain/logout: Log the driver out by invalidating their JWT token
+
 
