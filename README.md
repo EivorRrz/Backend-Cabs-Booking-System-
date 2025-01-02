@@ -47,6 +47,3 @@ A complete backend system for a **Cabs Booking System** built with  **NodeJs** ,
 3. Start the server:
     ```bash
     npm start
-
-
-
