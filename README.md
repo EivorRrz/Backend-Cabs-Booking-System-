@@ -1,4 +1,4 @@
-# Cabs Booking System Backend
+# Backend-Cabs-Booking-System
 
 A complete backend system for a **Cabs Booking System** built with  **NodeJs** , **Express.js**, and **MongoDB** . This system provides authentication, ride management, and user and driver profile management for both users and drivers.
 
