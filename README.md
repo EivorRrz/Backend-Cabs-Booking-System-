@@ -394,12 +394,6 @@ interface LogConfig {
 - Troubleshooting guide
 - Support portal
 
-## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-For detailed documentation, visit [docs.cabbooking.com](https://docs.cabbooking.com)
 
 
