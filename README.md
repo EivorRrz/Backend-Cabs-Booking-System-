@@ -258,15 +258,5 @@ graph LR
     G --> H[Deploy Production]
 ```
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Support & Contact
-
-- Documentation: [docs.cabsbooking.com](https://docs.cabsbooking.com)
-- Email: support@cabsbooking.com
-- Slack: [Join our community](https://slack.cabsbooking.com)
-- GitHub Issues: [Report bugs](https://github.com/username/repo/issues)
 
 
