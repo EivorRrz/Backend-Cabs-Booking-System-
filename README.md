@@ -1,9 +1,5 @@
 # Enterprise Cab Booking System Backend Architecture
 
-[![Build Status](https://travis-ci.org/username/repo.svg?branch=master)](https://travis-ci.org/username/repo)
-[![Coverage Status](https://coveralls.io/repos/github/username/repo/badge.svg?branch=master)](https://coveralls.io/github/username/repo?branch=master)
-[![Docker Pulls](https://img.shields.io/docker/pulls/username/repo.svg)](https://hub.docker.com/r/username/repo)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## System Architecture Overview
 
