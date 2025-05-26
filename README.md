@@ -1,262 +1,409 @@
-# Backend-Cabs-Booking-System 🚗
+# Enterprise Cab Booking System Backend Architecture
 
-A complete backend system for a **Cabs Booking System** built with **NodeJs**, **Express.js**, **MongoDB**, **Kafka**, **Redis** and **Docker**. This system provides robust authentication, ride management, and profile management features for both users and drivers. Built with modern technologies including Kafka for real-time event processing, Redis for caching, and Docker for containerization.
+[![Build Status](https://travis-ci.org/username/repo.svg?branch=master)](https://travis-ci.org/username/repo)
+[![Coverage Status](https://coveralls.io/repos/github/username/repo/badge.svg?branch=master)](https://coveralls.io/github/username/repo?branch=master)
+[![Docker Pulls](https://img.shields.io/docker/pulls/username/repo.svg)](https://hub.docker.com/r/username/repo)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-## 🌟 Features
+## System Architecture Overview
 
-### User Authentication & Management
-- **Advanced Authentication** 📝
-  - Multi-factor authentication (Email/SMS)
-  - OAuth2.0 integration (Google, Facebook)
-  - JWT with refresh token mechanism
-  - Session management with Redis
-  - Rate limiting and brute force protection
+Enterprise-grade cab booking system implementing a distributed microservices architecture with event-driven design patterns, built on Node.js ecosystem.
 
-### Captain Authentication & Management
-- **Comprehensive Driver System** 🚘
-  - Document verification workflow
-  - Vehicle registration and validation
-  - Real-time availability tracking
-  - Performance metrics and ratings
-  - Earnings management and analytics
+### Core Technology Stack
 
-### Ride Management
-- **Intelligent Booking System** 🎯
-  - Smart driver allocation using geohashing
-  - Real-time fare calculation
-  - Dynamic pricing based on demand
-  - Route optimization
-  - ETA prediction using ML models
+| Layer | Technologies |
+|-------|--------------|
+| Runtime Environment | Node.js (v16.x) |
+| API Framework | Express.js |
+| Database | MongoDB (Sharded Cluster) |
+| Caching | Redis (Cluster Mode) |
+| Message Broker | Apache Kafka |
+| Container Platform | Docker, Kubernetes |
+| Service Mesh | Istio |
+| API Gateway | Kong |
+| Load Balancer | NGINX |
 
-### Real-time Features
-- **Advanced Real-time Capabilities** ⚡
-  - Live location tracking with WebSocket
-  - Real-time notifications (Kafka)
-  - In-app messaging system
-  - Live fare updates
-  - SOS alert system
+### System Components
 
-### Analytics & Reporting
-- **Business Intelligence** 📊
-  - Ride analytics and insights
-  - Revenue reports
-  - Driver performance metrics
-  - User behavior analysis
-  - Peak hour predictions
+```mermaid
+graph TB
+    subgraph "Frontend Applications"
+        A[Web Application]
+        B[Mobile Applications]
+        C[Partner Portal]
+    end
 
-## 🏗️ Architecture
+    subgraph "API Gateway Layer"
+        D[Kong API Gateway]
+        E[Rate Limiting]
+        F[Authentication]
+    end
 
-### Microservices Architecture
+    subgraph "Service Mesh"
+        G[Istio Control Plane]
+        H[Service Discovery]
+        I[Circuit Breaking]
+    end
+
+    subgraph "Core Services"
+        J[User Service]
+        K[Driver Service]
+        L[Ride Service]
+        M[Payment Service]
+        N[Analytics Service]
+    end
+
+    subgraph "Data Layer"
+        O[MongoDB Cluster]
+        P[Redis Cluster]
+        Q[Kafka Cluster]
+    end
+
+    subgraph "Monitoring & Logging"
+        R[Prometheus]
+        S[Grafana]
+        T[ELK Stack]
+    end
+
+    A & B & C --> D
+    D --> G
+    G --> J & K & L & M & N
+    J & K & L & M & N --> O & P & Q
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   API Gateway   │────▶│  Auth Service   │────▶│  User Service   │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-        │                       │                        │
-        │               ┌─────────────────┐             │
-        └──────────────▶│  Ride Service   │◀────────────┘
-                       └─────────────────┘
-                              │
-                    ┌─────────────────────┐
-                    │   Driver Service    │
-                    └─────────────────────┘
+
+## Microservices Architecture
+
+### Service Decomposition
+
+| Service | Responsibility | Tech Stack | Database |
+|---------|---------------|------------|-----------|
+| User Service | User management, authentication | Node.js, Express.js | MongoDB |
+| Driver Service | Driver management, verification | Node.js, Express.js | MongoDB |
+| Ride Service | Ride booking, tracking | Node.js, Express.js, Kafka | MongoDB |
+| Payment Service | Payment processing, wallet | Node.js, Express.js | MongoDB |
+| Analytics Service | Business intelligence | Node.js, Express.js | MongoDB |
+
+### Inter-Service Communication
+
+#### Synchronous Communication
+- REST APIs with Circuit Breaker pattern
+- gRPC for high-performance services
+- GraphQL for aggregation layer
+
+#### Asynchronous Communication
+- Event-driven architecture using Kafka
+- Message queuing with dead letter queues
+- Event sourcing for state management
+
+## Data Architecture
+
+### Database Schema
+
+#### User Collection
+```typescript
+interface User {
+  _id: ObjectId;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  profile: {
+    firstName: string;
+    lastName: string;
+    avatar: string;
+  };
+  verification: {
+    isEmailVerified: boolean;
+    isPhoneVerified: boolean;
+    documents: Document[];
+  };
+  security: {
+    mfaEnabled: boolean;
+    lastLogin: Date;
+    loginAttempts: number;
+  };
+  metadata: {
+    createdAt: Date;
+    updatedAt: Date;
+    lastActive: Date;
+  };
+}
 ```
 
-### Tech Stack Details
+#### Ride Collection
+```typescript
+interface Ride {
+  _id: ObjectId;
+  userId: ObjectId;
+  driverId: ObjectId;
+  status: RideStatus;
+  location: {
+    pickup: GeoJSON;
+    dropoff: GeoJSON;
+    currentLocation?: GeoJSON;
+  };
+  pricing: {
+    basePrice: number;
+    surgeMultiplier: number;
+    tax: number;
+    total: number;
+  };
+  metadata: {
+    createdAt: Date;
+    updatedAt: Date;
+    completedAt?: Date;
+  };
+}
+```
 
-#### Core Services
-- **API Gateway**: Express.js with rate limiting
-- **Auth Service**: JWT, OAuth2.0, Redis sessions
-- **User Service**: MongoDB, Redis cache
-- **Ride Service**: Kafka, MongoDB
-- **Driver Service**: MongoDB, Redis
+### Caching Strategy
 
-#### Data Storage
-- **MongoDB**
-  - Sharded clusters
-  - Replica sets for HA
-  - Time-series collections for metrics
-- **Redis**
-  - Cluster mode
-  - Persistence enabled
-  - Cache policies
+#### Redis Implementation
+```typescript
+interface CacheConfig {
+  driver: 'redis';
+  cluster: {
+    nodes: string[];
+    options: {
+      scaleReads: 'all' | 'master' | 'slave';
+      maxRedirections: number;
+      retryDelayOnFailover: number;
+    };
+  };
+  options: {
+    prefix: string;
+    ttl: number;
+    maxMemory: string;
+    evictionPolicy: 'allkeys-lru' | 'volatile-lru';
+  };
+}
+```
 
-#### Message Broker
-- **Apache Kafka**
-  - Multi-broker setup
-  - Topic partitioning
-  - Message compression
-  - Dead letter queues
+## System Configurations
 
-## 🛠️ Development Setup
+### Kubernetes Deployment
 
-### Prerequisites
-```bash
-Node.js >= 16.x
-MongoDB >= 5.0
-Redis >= 6.0
-Kafka >= 3.0
-Docker >= 20.10
-Docker Compose >= 2.0
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cab-booking-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cab-booking
+  template:
+    metadata:
+      labels:
+        app: cab-booking
+    spec:
+      containers:
+      - name: cab-booking
+        image: cab-booking:latest
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
 ```
 
 ### Environment Configuration
-```bash
-# Core
-NODE_ENV=development
-PORT=3000
-LOG_LEVEL=debug
 
-# MongoDB
-MONGO_URI=mongodb://localhost:27017/cab_booking
-MONGO_REPLICA_SET=rs0
-
-# Redis
-REDIS_URL=redis://localhost:6379
-REDIS_PASSWORD=your_password
-REDIS_CLUSTER_URLS=["redis://redis-1:6379","redis://redis-2:6379"]
-
-# Kafka
-KAFKA_BROKERS=localhost:9092,localhost:9093
-KAFKA_CLIENT_ID=cab_booking_service
-KAFKA_GROUP_ID=cab_booking_group
-
-# JWT
-JWT_SECRET=your_jwt_secret
-JWT_REFRESH_SECRET=your_refresh_secret
-JWT_EXPIRY=1h
-JWT_REFRESH_EXPIRY=7d
-
-# Services
-AUTH_SERVICE_URL=http://localhost:3001
-USER_SERVICE_URL=http://localhost:3002
-RIDE_SERVICE_URL=http://localhost:3003
-DRIVER_SERVICE_URL=http://localhost:3004
-```
-
-## 📚 API Documentation
-
-### Authentication API
 ```typescript
-POST /api/v1/auth/register     - Register new user
-POST /api/v1/auth/login        - Login user
-POST /api/v1/auth/refresh      - Refresh token
-POST /api/v1/auth/logout       - Logout user
-POST /api/v1/auth/verify-otp   - Verify OTP
+interface EnvironmentConfig {
+  app: {
+    name: string;
+    version: string;
+    environment: 'development' | 'staging' | 'production';
+    port: number;
+    apiVersion: string;
+  };
+  mongodb: {
+    uri: string;
+    options: {
+      replicaSet: string;
+      readPreference: string;
+      maxPoolSize: number;
+    };
+  };
+  redis: {
+    cluster: boolean;
+    nodes: string[];
+    password: string;
+    keyPrefix: string;
+  };
+  kafka: {
+    clientId: string;
+    brokers: string[];
+    ssl: boolean;
+    sasl: {
+      mechanism: 'plain' | 'scram-sha-256' | 'scram-sha-512';
+      username: string;
+      password: string;
+    };
+  };
+  jwt: {
+    secret: string;
+    refreshSecret: string;
+    accessExpiry: string;
+    refreshExpiry: string;
+  };
+}
 ```
 
-### User API
-```typescript
-GET    /api/v1/users/profile           - Get user profile
-PUT    /api/v1/users/profile           - Update profile
-GET    /api/v1/users/rides             - Get ride history
-POST   /api/v1/users/payment-methods   - Add payment method
-GET    /api/v1/users/payment-methods   - Get payment methods
-```
+## Security Implementation
 
-### Driver API
-```typescript
-POST   /api/v1/drivers/register        - Register as driver
-PUT    /api/v1/drivers/status          - Update availability
-GET    /api/v1/drivers/earnings        - Get earnings
-GET    /api/v1/drivers/performance     - Get performance metrics
-POST   /api/v1/drivers/documents       - Upload documents
-```
-
-### Ride API
-```typescript
-POST   /api/v1/rides/estimate          - Get fare estimate
-POST   /api/v1/rides/book              - Book ride
-PUT    /api/v1/rides/:id/status        - Update ride status
-GET    /api/v1/rides/:id/track         - Track ride
-POST   /api/v1/rides/:id/cancel        - Cancel ride
-POST   /api/v1/rides/:id/rate          - Rate ride
-```
-
-## 🔒 Security Measures
-
-### Authentication
-- JWT with refresh token rotation
-- Rate limiting per IP and user
-- Request signing for API authentication
-- OAuth2.0 implementation
-- Multi-factor authentication
-
-### Data Protection
-- End-to-end encryption for messages
-- PII data encryption at rest
-- Secure session management
-- HTTPS enforcement
-- XSS protection
-- CSRF protection
-
-### Infrastructure
-- Container security scanning
-- Secrets management
-- Network isolation
-- Regular security audits
-- Automated vulnerability scanning
-
-## 🐳 Docker Infrastructure
-
-### Services Architecture
-```yaml
-services:
-  api-gateway:
-    scale: 2
-    
-  auth-service:
-    scale: 2
-    
-  user-service:
-    scale: 2
-    
-  ride-service:
-    scale: 3
-    
-  driver-service:
-    scale: 2
-
-  mongodb:
-    cluster: true
-    replicas: 3
-    
-  redis:
-    cluster: true
-    nodes: 3
-    
-  kafka:
-    brokers: 3
-    zookeeper: 3
-```
-
-## 📊 Monitoring & Logging
-
-### Metrics Collection
-- Prometheus metrics
-- Grafana dashboards
-- ELK stack integration
-- Custom business metrics
-- Performance monitoring
-
-### Log Management
-- Centralized logging
-- Log rotation
-- Error tracking
-- Audit logging
-- Transaction tracing
-
-## 🚀 CI/CD Pipeline
+### Authentication Flow
 
 ```mermaid
-graph LR
-    A[Code Push] --> B[Unit Tests]
-    B --> C[Integration Tests]
-    C --> D[Security Scan]
-    D --> E[Build Images]
-    E --> F[Deploy Staging]
-    F --> G[E2E Tests]
-    G --> H[Deploy Production]
+sequenceDiagram
+    participant C as Client
+    participant AG as API Gateway
+    participant AS as Auth Service
+    participant RS as Resource Service
+    participant DB as Database
+
+    C->>AG: Request with JWT
+    AG->>AG: Validate JWT
+    AG->>AS: Verify Token
+    AS->>DB: Check Token Blacklist
+    DB-->>AS: Token Status
+    AS-->>AG: Token Valid
+    AG->>RS: Forward Request
+    RS-->>C: Response
 ```
 
+### Security Measures
+
+#### API Security
+- Rate limiting per IP and user
+- JWT with refresh token rotation
+- Request signing
+- API key management
+- Input validation and sanitization
+
+#### Data Security
+- End-to-end encryption
+- Data at rest encryption
+- PII data handling
+- GDPR compliance
+- Data retention policies
+
+#### Infrastructure Security
+- Network segmentation
+- Container security
+- Secrets management
+- Regular security audits
+- Vulnerability scanning
+
+## Performance Optimization
+
+### Caching Strategy
+- Multi-level caching
+- Cache invalidation patterns
+- Cache warming
+- Cache hit ratio monitoring
+- Distributed caching
+
+### Database Optimization
+- Indexing strategy
+- Query optimization
+- Connection pooling
+- Sharding strategy
+- Read replicas
+
+## Monitoring & Observability
+
+### Metrics Collection
+```typescript
+interface MetricsConfig {
+  prometheus: {
+    endpoint: string;
+    prefix: string;
+    defaultLabels: Record<string, string>;
+  };
+  metrics: {
+    http: {
+      requestDuration: boolean;
+      requestSize: boolean;
+      responseDuration: boolean;
+      responseSize: boolean;
+    };
+    business: {
+      activeRides: boolean;
+      completedRides: boolean;
+      cancelledRides: boolean;
+      revenue: boolean;
+    };
+  };
+}
+```
+
+### Logging Configuration
+```typescript
+interface LogConfig {
+  level: 'debug' | 'info' | 'warn' | 'error';
+  format: 'json' | 'pretty';
+  destination: 'console' | 'file' | 'elastic';
+  retention: string;
+  compression: boolean;
+}
+```
+
+## Development & Deployment
+
+### CI/CD Pipeline
+1. Code Quality
+   - Static code analysis
+   - Unit testing
+   - Integration testing
+   - Code coverage
+   - Security scanning
+
+2. Build Process
+   - Multi-stage Docker builds
+   - Image vulnerability scanning
+   - Image signing
+   - Registry push
+
+3. Deployment
+   - Blue-green deployment
+   - Canary releases
+   - Rollback strategy
+   - Health monitoring
+
+## Documentation & Support
+
+### API Documentation
+- OpenAPI 3.0 specification
+- Postman collection
+- Integration examples
+- Rate limit documentation
+- Error handling guide
+
+### Support Channels
+- Technical documentation
+- API reference
+- Integration guide
+- Troubleshooting guide
+- Support portal
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+For detailed documentation, visit [docs.cabbooking.com](https://docs.cabbooking.com)
 
 
